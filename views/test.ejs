@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVG49ILM-LzB5si_emdSYTz4Sejsiknpw&callback=initialize&libraries=&v=weekly"
+      defer
+    ></script>
+    <style type="text/css">
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #map,
+      #pano {
+        float: left;
+        height: 100%;
+        width: 50%;
+      }
+    </style>
+    <script>
+      function initialize() {
+        const fenway = { lat: 42.345573, lng: -71.098326 };
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: fenway,
+          zoom: 14,
+        });
+        const panorama = new google.maps.StreetViewPanorama(
+          document.getElementById("pano"),
+          {
+            position: fenway,
+            pov: {
+              heading: 34,
+              pitch: 10,
+            },
+          }
+        );
+        map.setStreetView(panorama);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="pano"></div>
+  </body>
+</html>
