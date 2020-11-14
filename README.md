@@ -1,4 +1,4 @@
-# TripUntilCoronaEnd
+# TripUntilCoronaEnds
 Trip on web with google map
 
 git clone
