@@ -15,14 +15,27 @@
         padding: 0;
       }
 
-      #map,
+      #map {
+        position: absolute;
+        left: calc(20% + 20px);
+        bottom: 20px;
+        height: 300px;
+        width: 300px;
+        z-index: 2;
+      }
+      #sidetab {
+        float: left;
+        height: 100%;
+        width: 20%;
+      }
       #pano {
         float: left;
         height: 100%;
-        width: 50%;
+        width: 80%;
       }
     </style>
     <script>
+      var p, m;
       function initialize() {
         const fenway = { lat: 42.345573, lng: -71.098326 };
         const map = new google.maps.Map(document.getElementById("map"), {
@@ -40,11 +53,14 @@
           }
         );
         map.setStreetView(panorama);
+        m = map
+        p = panorama
       }
     </script>
   </head>
   <body>
     <div id="map"></div>
+    <div id="sidetab"></div>
     <div id="pano"></div>
   </body>
 </html>
