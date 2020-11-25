@@ -9,13 +9,19 @@ router.get('/1', function(req, res, next) {
       course_title: '코스 명',
       course_list: [
         {
-          courseItemName: '1번',
+          courseItemName: '서울과기대 정문',
+          lat: 37.63014756196891,
+          lng: 127.0763783269148,
         },
         {
-          courseItemName: '2번',
+          courseItemName: '공릉역',
+          lat: 37.62532966688715,
+          lng: 127.0731935783579,
         },
         {
-          courseItemName: '3번',
+          courseItemName: '하계역',
+          lat: 37.63594705616194,
+          lng: 127.0684599110117,
         }
       ]
     } 
