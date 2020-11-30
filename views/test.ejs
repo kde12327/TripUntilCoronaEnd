@@ -101,6 +101,24 @@
         border-radius: 2px;
         line-height: 40px;
       }
+      #course_finish{
+        width: 200px;
+        height: 40px;
+        position: absolute;
+        background-color: #222222;
+        right: 60px;
+        bottom: 25px;
+        z-index: 2;
+        color: #666;
+        text-align: center;
+        font-size: x-large;
+        cursor: pointer;
+        border-radius: 2px;
+        line-height: 40px;
+      }
+      .hidden {
+        visibility: hidden;
+      }
     </style>
     <script>
       
@@ -142,9 +160,7 @@
           panorama = p;
         };
         this.nextIndex = function() {
-          if(currentIndex == courseList.length - 1){
-            
-          }else{
+          if(currentIndex != courseList.length - 1){
             currentIndex ++;
             this.panoramaReload();
           }
@@ -153,8 +169,13 @@
         this.listRefresh = function() {
           var $list = $('div#course_list');
           $list.empty();
-          if(currentIndex >= courseList) {
-            currentIndex = courseList - 1;
+
+          $('#next_course').removeClass('hidden');
+          $('#course_finish').addClass('hidden');
+          if(currentIndex >= courseList.length - 1) {  
+            currentIndex = courseList.length - 1;
+            $('#next_course').addClass('hidden');
+            $('#course_finish').removeClass('hidden');
           }
           courseList.forEach( (e, i) => {
             $list.append(`
@@ -267,5 +288,6 @@
     </div>
     <div id="pano"></div>
     <div id="next_course">다음 코스로</div>
+    <div id="course_finish" class="hidden">코스 끝내기</div>
   </body>
 </html>
