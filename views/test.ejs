@@ -85,6 +85,7 @@
         top: 50%;
         transform: translateY(-50%);
         white-space:nowrap;
+        cursor: pointer;
       }
       #next_course{
         width: 200px;
@@ -147,6 +148,8 @@
         };
         this.setIndex = function(i) {
           currentIndex = i;
+          this.panoramaReload();
+          this.listRefresh();
         };
         this.getMap = function() {
           return map;
@@ -167,9 +170,12 @@
           this.listRefresh();
         };
         this.listRefresh = function() {
+          
+          var _this = this;
+
           var $list = $('div#course_list');
           $list.empty();
-
+          
           $('#next_course').removeClass('hidden');
           $('#course_finish').addClass('hidden');
           if(currentIndex >= courseList.length - 1) {  
@@ -178,8 +184,8 @@
             $('#course_finish').removeClass('hidden');
           }
           courseList.forEach( (e, i) => {
-            $list.append(`
-              <li>
+            let $li = $(`
+              <li click="liClick(${i})">
                 <div id="course_list_item_img">
                   <svg width="18" height="40" viewBox="0 0 18 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g id="group">
@@ -192,7 +198,11 @@
                 </div>
                 <div id="course_list_item_name">${e.courseItemName}</div>
               </li> 
-            `)
+            `);
+            $li.on('click', function(){
+              _this.setIndex(i)
+            })
+            $list.append($li)
           });
           
         }
