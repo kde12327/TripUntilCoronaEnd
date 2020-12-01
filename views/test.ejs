@@ -59,17 +59,17 @@
         list-style-type: none;
         height: 40px;
       }
-      #course_list li #course_list_item_img{
+      #course_list li .course_list_item_img{
         margin: 0 0 0 20px; 
         float: left; 
         height: 40px;
       }
 
-      #course_list li:first-child #course_list_item_img svg g #top_line{
+      #course_list li:first-child .course_list_item_img svg g #top_line{
         visibility: hidden;
       }
 
-      #course_list li:last-child #course_list_item_img svg g #bottom_line{
+      #course_list li:last-child .course_list_item_img svg g #bottom_line{
         visibility: hidden;
       }
 
@@ -77,7 +77,7 @@
         fill: #A4FF8D;
       }
 
-      #course_list li #course_list_item_name{
+      #course_list li .course_list_item_name{
         float: left; 
         left: 58px;
         text-align: center;
@@ -102,6 +102,21 @@
         border-radius: 2px;
         line-height: 40px;
       }
+      #edit_course{
+        width: 200px;
+        height: 40px;
+        position: absolute;
+        background-color: #222222;
+        right: 60px;
+        bottom: 70px;
+        z-index: 2;
+        color: #666;
+        text-align: center;
+        font-size: x-large;
+        cursor: pointer;
+        border-radius: 2px;
+        line-height: 40px;
+      }
       #course_finish{
         width: 200px;
         height: 40px;
@@ -117,19 +132,41 @@
         border-radius: 2px;
         line-height: 40px;
       }
+      .course_list_item_detail{
+        position: absolute;
+        right: 0;
+        cursor: pointer;
+      }
+      .course_list_item_detail_menu{
+        position: absolute;
+      }
       .hidden {
         visibility: hidden;
       }
     </style>
     <script>
-      
-
       function Course() {
         var courseTitle = '<%= data.course_title %>';
         var courseList = eval('<%- JSON.stringify(data.course_list) %>');
         var currentIndex = 0;
+        var mode = 'tour';
         var map = null;
         var panorama = null;
+
+
+        this.removeAt = function(index) {
+          if(index >= courseList.length - 1) {  
+            currentIndex = courseList.length - 2;
+          }
+          courseList.splice(index, 1);
+          this.panoramaReload();
+          this.listRefresh();
+        }
+        this.insertAt = function(index, obj) {
+          courseList.splice(index, 0, obj);
+          this.panoramaReload();
+          this.listRefresh();
+        }
 
         this.getTitle = function() {
           return courseTitle;
@@ -150,6 +187,12 @@
           currentIndex = i;
           this.panoramaReload();
           this.listRefresh();
+        };
+        this.getMode = function() {
+          return mode;
+        };
+        this.setMode = function(m) {
+          mode = m;
         };
         this.getMap = function() {
           return map;
@@ -181,12 +224,27 @@
           if(currentIndex >= courseList.length - 1) {  
             currentIndex = courseList.length - 1;
             $('#next_course').addClass('hidden');
-            $('#course_finish').removeClass('hidden');
+            if(this.getMode() == 'tour') {
+              $('#course_finish').removeClass('hidden');
+            }
           }
           courseList.forEach( (e, i) => {
+            const detail = `
+              <div class="course_list_item_detail">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="20" cy="11" r="2" fill="#a2a2a2"/>
+                  <circle cx="20" cy="29" r="2" fill="#a2a2a2"/>
+                  <circle cx="20" cy="20" r="2" fill="#a2a2a2"/>
+                </svg>
+                <div class="course_list_item_detail_menu hidden">
+                  <div class="course_list_item_detail_menu_item rename_place">장소 이름 변경</div>
+                  <div class="course_list_item_detail_menu_item replace_current_location">현재 위치로 설정</div>
+                </div>
+              </div>`
+
             let $li = $(`
-              <li click="liClick(${i})">
-                <div id="course_list_item_img">
+              <li id="course_list_item_${i}">
+                <div id="course_list_item_img_${i}" class="course_list_item_img">
                   <svg width="18" height="40" viewBox="0 0 18 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g id="group">
                     <line id="bottom_line" x1="9" y1="20" x2="9" y2="40" stroke="#979797" stroke-width="2"/>
@@ -196,14 +254,47 @@
                     </g>
                   </svg>
                 </div>
-                <div id="course_list_item_name">${e.courseItemName}</div>
+                <div id="course_list_item_name_${i}" class="course_list_item_name" >${e.courseItemName}</div>
+                ${_this.getMode()=='edit'? detail:''}
               </li> 
             `);
-            $li.on('click', function(){
+            $li.on('click', (e) => {
               _this.setIndex(i)
             })
+            if(_this.getMode() == 'edit'){
+              $li.children('.course_list_item_name').attr('draggable', 'true')
+              $li.children('.course_list_item_name').on('dragstart', (e) => {
+                e.originalEvent.dataTransfer.setData('text/plain', e.target.id);
+                e.originalEvent.currentTarget.style.backgroundColor = '#dcdcdc'
+              })
+              $li.children('.course_list_item_name').on('dragend', (e) => {
+                e.originalEvent.dataTransfer.setData('text/plain', e.target.id);
+                e.originalEvent.currentTarget.style.backgroundColor = ''
+              })
+              $li.on('dragover', (e) => {
+                e.preventDefault();
+              })
+              $li.on('drop', (e) => {
+                const draggableId = e.originalEvent.dataTransfer.getData('text');
+                const draggableIdx = draggableId.split('_').pop();
+                const targetId = e.target.id;
+                const targetIdx = targetId.split('_').pop();
+                // const $draggableEl = $(draggableId);
+                // const $targetEl = $(targetId);
+
+                const draggableItem = _this.getList()[draggableIdx];
+
+                _this.removeAt(draggableIdx)
+                _this.insertAt(targetIdx, draggableItem)
+                _this.setIndex(targetIdx)
+                
+
+                e.originalEvent.dataTransfer.clearData();
+              })
+            }
             $list.append($li)
           });
+
           
         }
         this.panoramaReload = function(){
@@ -216,6 +307,20 @@
       $(document).ready(() => {
         $('#next_course').on('click', (e) => {
           course.nextIndex();
+        })
+        $('div#edit_course').on('click', (e) => {
+          console.log()
+          if($('div#edit_course').text() == '수정'){
+            course.setMode('edit')
+            course.listRefresh()
+            course.panoramaReload()
+            $('div#edit_course').text('완료')
+          }else{
+            course.setMode('tour')
+            course.listRefresh()
+            course.panoramaReload()
+            $('div#edit_course').text('수정')
+          }
         })
       })
 
@@ -297,6 +402,7 @@
       </div>
     </div>
     <div id="pano"></div>
+    <div id="edit_course">수정</div>
     <div id="next_course">다음 코스로</div>
     <div id="course_finish" class="hidden">코스 끝내기</div>
   </body>
