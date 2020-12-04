@@ -114,3 +114,19 @@ figcaption{
   left: 0; 
   right:0
 }
+#about__main {
+  padding-top:5%;
+  padding-left: 8%;
+  padding-right: 8%;
+}
+.about__contents {
+ padding-bottom: 5%;
+}
+.about__contents h1 {
+  font:40px "Lucida Grande", Helvetica, Arial, sans-serif;
+  padding-bottom: 2%;
+}
+
+.about__contents p {
+  font:20px "Lucida Grande", Helvetica, Arial, sans-serif;
+}

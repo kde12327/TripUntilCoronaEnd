@@ -9,4 +9,8 @@ router.get('/', function(req, res, next) {
   res.render('home', { title: 'TUCE' });
 });
 
+router.get('/about', function(req, res, next) {
+  res.render('about', { title: 'TUCE' });
+});
+
 module.exports = router;
