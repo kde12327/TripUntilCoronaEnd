@@ -53,24 +53,36 @@
         padding: 10px 0 0 0;
         float: top;
       }
-      #course_list li{
+      #course_list li.course_list_item{
         position: relative;
         float: top;
         list-style-type: none;
         height: 40px;
       }
-      #course_list li .course_list_item_img{
+      #course_list li.course_list_item .course_list_item_img{
         margin: 0 0 0 20px; 
         float: left; 
         height: 40px;
       }
 
-      #course_list li:first-child .course_list_item_img svg g #top_line{
+      #course_list li.course_list_item:first-child .course_list_item_img svg g #top_line{
         visibility: hidden;
       }
 
-      #course_list li:last-child .course_list_item_img svg g #bottom_line{
+      #course_list li.course_list_item:last-child .course_list_item_img svg g #bottom_line{
         visibility: hidden;
+      }
+      #course_list li.course_list_item_add{
+        position: relative;
+        height: 20px;
+        list-style-type: none;
+        color: #666;
+        padding: 10px 30px;
+        font-size: larger;
+      }
+      #course_list li.course_list_item_add:hover{
+        background-color: #eee;
+        cursor: pointer;
       }
 
       .course_list_item_img_selected{
@@ -138,7 +150,32 @@
         cursor: pointer;
       }
       .course_list_item_detail_menu{
+        display: block;
         position: absolute;
+        background-color: white;
+        padding: 10px 0px;
+        border-radius: 5px;
+        box-shadow: 2px 2px 30px lightgrey;
+        transform-origin: center;
+        z-index: 2;
+        transform: scale(0);
+        transition: transform 0.2s, opacity 0.2s;
+        width: 200px;
+      }
+      .course_list_item_detail_menu_show{
+        transform: scale(1);
+        transform-origin: top left;
+      }
+
+      .course_list_item_detail_menu_item{
+        display: block;
+        padding: 10px 30px;
+        transition: 0.1s;
+        color: #666;
+      }
+      .course_list_item_detail_menu_item:hover{
+        background-color: #eee;
+        cursor: pointer;
       }
       .hidden {
         visibility: hidden;
@@ -243,7 +280,7 @@
               </div>`
 
             let $li = $(`
-              <li id="course_list_item_${i}">
+              <li id="course_list_item_${i}" class="course_list_item">
                 <div id="course_list_item_img_${i}" class="course_list_item_img">
                   <svg width="18" height="40" viewBox="0 0 18 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g id="group">
@@ -258,6 +295,7 @@
                 ${_this.getMode()=='edit'? detail:''}
               </li> 
             `);
+
             $li.on('click', (e) => {
               _this.setIndex(i)
             })
@@ -291,9 +329,52 @@
 
                 e.originalEvent.dataTransfer.clearData();
               })
+              $li.children('div.course_list_item_detail').on('click', (e) => {
+                let $detailMenu = $li.children('div.course_list_item_detail').children('div.course_list_item_detail_menu')
+                if($detailMenu.hasClass('hidden')){
+                  $detailMenu.removeClass('hidden')
+                  $detailMenu.addClass('course_list_item_detail_menu_show')
+                  $(document).one('click', (e) => {
+                    $detailMenu.removeClass('course_list_item_detail_menu_show')
+                    $detailMenu.addClass('hidden')
+                  })
+                }else {
+                  $detailMenu.removeClass('course_list_item_detail_menu_show')
+                  $detailMenu.addClass('hidden')
+                }
+
+                e.stopPropagation()
+              })
+              $li.children('div.course_list_item_detail').children('div.course_list_item_detail_menu').children('div.rename_place').on('click', (e) => {
+                const list = _this.getList();
+                const result = prompt("장소 이름 입력", list[i].courseItemName);
+                if(result) {
+                  list[i].courseItemName = result
+                }
+                _this.listRefresh()
+              })
+              $li.children('div.course_list_item_detail').children('div.course_list_item_detail_menu').children('div.replace_current_location').on('click', (e) => {
+                const list = _this.getList();
+                const p =_this.getPanorama().getPosition();
+                list[i].lat = p.lat()
+                list[i].lng = p.lng()
+                
+              })
             }
             $list.append($li)
           });
+          if(_this.getMode()=='edit'){
+            $list.append($(`
+            <li id="course_list_item_add" class="course_list_item_add">
+              + Add place
+            </li>
+            `))
+            $('#course_list_item_add').on('click', (e) => {
+              const list = _this.getList()
+              list.push(list[list.length - 1])
+              _this.listRefresh()
+            })
+          }
 
           
         }
