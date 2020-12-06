@@ -401,6 +401,17 @@
             course.listRefresh()
             course.panoramaReload()
             $('div#edit_course').text('수정')
+            $.ajax({
+              url: "/api/course",
+              method: "POST",
+              data: { 
+                list: JSON.stringify(course.getList()),
+              }
+            }).done(function() {
+              alert( "success" );
+            }).fail(function() {
+              alert( "error" );
+            })
           }
         })
       })
