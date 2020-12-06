@@ -1,0 +1,37 @@
+{
+	"development": {
+		"username": "tuceuser",
+		"password": "tucepw1!",
+		"database": "tuce",
+		"host": "virustracker.iptime.org",
+		"port": "13306",
+		"dialect": "mysql",
+		"define": {
+			"timestamps": false,
+			"underscored": false
+		},
+		"init": false,
+		"logging": false
+	},
+	"test": {
+		"username": "tuceuser",
+		"password": "tucepw1!",
+		"database": "tuce",
+		"host": "virustracker.iptime.org",
+		"port": "13306",
+		"dialect": "mysql"
+	},
+	"production": {
+		"username": "tuceuser",
+		"password": "tucepw1!",
+		"database": "tuce",
+		"host": "virustracker.iptime.org",
+		"port": "13306",
+		"dialect": "mysql",
+		"define": {
+			"timestamps": false,
+			"underscored": true
+		},
+		"logging": false
+	}
+}

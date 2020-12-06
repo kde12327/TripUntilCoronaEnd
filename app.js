@@ -1,4 +1,7 @@
 var createError = require('http-errors');
+
+var path = require('path');
+var fs = require('fs');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -8,7 +11,10 @@ var favicon = require('serve-favicon');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+var sequelize = require('./models/index').sequelize;
+
 var app = express();
+sequelize.sync();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

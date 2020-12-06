@@ -183,8 +183,8 @@
     </style>
     <script>
       function Course() {
-        var courseTitle = '<%= data.course_title %>';
-        var courseList = eval('<%- JSON.stringify(data.course_list) %>');
+        var courseName = '<%= data.courseName %>';
+        var courseList = eval('<%- JSON.stringify(data.courseList) %>');
         var currentIndex = 0;
         var mode = 'tour';
         var map = null;
@@ -206,10 +206,10 @@
         }
 
         this.getTitle = function() {
-          return courseTitle;
+          return courseName;
         };
         this.setTitle = function(title) {
-          courseTitle = title;
+          courseName = title;
         };
         this.getList = function() {
           return courseList;
@@ -291,7 +291,7 @@
                     </g>
                   </svg>
                 </div>
-                <div id="course_list_item_name_${i}" class="course_list_item_name" >${e.courseItemName}</div>
+                <div id="course_list_item_name_${i}" class="course_list_item_name" >${e.PlaceName}</div>
                 ${_this.getMode()=='edit'? detail:''}
               </li> 
             `);
@@ -347,17 +347,17 @@
               })
               $li.children('div.course_list_item_detail').children('div.course_list_item_detail_menu').children('div.rename_place').on('click', (e) => {
                 const list = _this.getList();
-                const result = prompt("장소 이름 입력", list[i].courseItemName);
+                const result = prompt("장소 이름 입력", list[i].PlaceName);
                 if(result) {
-                  list[i].courseItemName = result
+                  list[i].PlaceName = result
                 }
                 _this.listRefresh()
               })
               $li.children('div.course_list_item_detail').children('div.course_list_item_detail_menu').children('div.replace_current_location').on('click', (e) => {
                 const list = _this.getList();
                 const p =_this.getPanorama().getPosition();
-                list[i].lat = p.lat()
-                list[i].lng = p.lng()
+                list[i].Lat = p.lat()
+                list[i].Lng = p.lng()
                 
               })
             }
@@ -371,7 +371,7 @@
             `))
             $('#course_list_item_add').on('click', (e) => {
               const list = _this.getList()
-              list.push(list[list.length - 1])
+              list.push(eval('(' + JSON.stringify(list[list.length - 1]) + ')'))
               _this.listRefresh()
             })
           }
@@ -379,7 +379,7 @@
           
         }
         this.panoramaReload = function(){
-          panorama.setPosition(new google.maps.LatLng(courseList[currentIndex].lat, courseList[currentIndex].lng));
+          panorama.setPosition(new google.maps.LatLng(courseList[currentIndex].Lat, courseList[currentIndex].Lng));
         }
       } 
 
@@ -390,7 +390,6 @@
           course.nextIndex();
         })
         $('div#edit_course').on('click', (e) => {
-          console.log()
           if($('div#edit_course').text() == '수정'){
             course.setMode('edit')
             course.listRefresh()
@@ -405,6 +404,7 @@
               url: "/api/course",
               method: "POST",
               data: { 
+                courseId: '<%= data.courseId %>',
                 list: JSON.stringify(course.getList()),
               }
             }).done(function() {
@@ -420,7 +420,7 @@
         
         course.listRefresh();
 
-        const startPostion = { lat: course.getList()[0].lat, lng: course.getList()[0].lng };
+        const startPostion = { lat: course.getList()[0].Lat, lng: course.getList()[0].Lng };
 
         course.setMap( 
           new google.maps.Map(document.getElementById("map"), {
@@ -473,24 +473,9 @@
     <div id="map"></div>
     <div id="sidetab">
       <div id="course_title">
-        <%= data.course_title %>
+        <%= data.courseName %>
       </div>
       <div id="course_list">
-        <!-- <% data.course_list.forEach(function(val){ %> 
-          <li>
-            <div id="course_list_item_img">
-              <svg width="18" height="40" viewBox="0 0 18 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g id="group">
-                <line id="bottom_line" x1="9" y1="20" x2="9" y2="40" stroke="#979797" stroke-width="2"/>
-                <line id="top_line" x1="9" x2="9" y2="20" stroke="#979797" stroke-width="2"/>
-                <circle id="outer_ellipse" r="9" transform="matrix(-1 0 0 1 9 20)" fill="#979797"/>
-                <circle id="inner_ellipse" r="7" transform="matrix(-1 0 0 1 9 20)" fill="#A4FF8D"/>
-                </g>
-              </svg>
-            </div>
-            <div id="course_list_item_name"><%= val.courseItemName %></div>
-          </li> 
-        <% }) %> -->
       </div>
     </div>
     <div id="pano"></div>
