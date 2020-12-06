@@ -130,3 +130,55 @@ figcaption{
 .about__contents p {
   font:20px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
+.login-form {
+  width: 400px;
+  margin: 0 auto;
+  margin-top: 5%;
+  padding: 60px;
+  font-family: 20px "Lucida Grande", Helvetica, Arial, sans-serif;
+  border: 2px solid #4d4d4d; 
+  border-radius: 15px;
+}
+.login-form h1 {
+  text-align: center;
+  color: #4d4d4d;
+  font-size: 24px;
+  padding: 20px 0 20px 0;
+}
+.login-form input[type="password"],
+.login-form input[type="text"],
+.login-form input[type="email"] {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #dddddd;
+  margin-bottom: 25px;
+  box-sizing:border-box;
+}
+.login-form input[type="submit"] {
+  width: 60%;
+  padding: 15px;
+  margin-left: 20%;
+  background-color: #38c8a8;
+  border: 0;
+  border-radius: 5px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-weight: bold;
+  color: #ffffff;
+}
+.login-form form {
+  padding-bottom: 15px;
+ 
+}
+button {
+  width: 60%;
+  padding: 15px;
+  margin-left: 20%;
+  background-color: #38c8a8;
+  border:0;
+  border-radius: 5px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-weight: bold;
+  color: #ffffff;
+}
