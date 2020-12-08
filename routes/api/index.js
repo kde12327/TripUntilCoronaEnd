@@ -6,7 +6,6 @@ var {
   Place
 } =  require ('../../models')
 
-/* GET home page. */
 router.post('/course', async function(req, res, next) {
   const courseId = JSON.parse(req.body.courseId)
   const list = JSON.parse(req.body.list)
@@ -31,5 +30,19 @@ router.post('/course', async function(req, res, next) {
 
   res.status(201).send('success');
 });
+
+// /* GET home page. */
+// router.get('/course/number/:number', async function(req, res, next) {
+//   req.params.productId
+
+  
+//   const course = await Course.fundAll({
+//     where: {
+//       CourseId: courseId
+//     }
+//   });
+
+//   res.status(201).json(course.str);
+// });
 
 module.exports = router;

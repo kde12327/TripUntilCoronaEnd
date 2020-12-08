@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Overlays Within Street View</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVG49ILM-LzB5si_emdSYTz4Sejsiknpw&callback=initialize&libraries=&v=weekly"
+      defer
+    ></script>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.min.js"
+      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+      crossorigin="anonymous"></script>
+    <style type="text/css">
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        left: calc(20% + 20px);
+        bottom: 20px;
+        height: 300px;
+        width: 300px;
+        z-index: 2;
+      }
+      #sidetab {
+        float: left;
+        height: 100%;
+        width: 20%;
+      }
+      #pano {
+        float: left;
+        height: 100%;
+        width: 80%;
+      }
+      #course_title {
+        height: 60px;
+        width: 100%;
+        font-size: x-large;
+        text-align: center;
+        padding: 20px 0 0 0;
+        background-color: #97cbff;
+      }
+      #course_list {
+        padding: 10px 0 0 0;
+        float: top;
+      }
+      #course_list li.course_list_item{
+        position: relative;
+        float: top;
+        list-style-type: none;
+        height: 40px;
+      }
+      #course_list li.course_list_item .course_list_item_img{
+        margin: 0 0 0 20px; 
+        float: left; 
+        height: 40px;
+      }
+
+      #course_list li.course_list_item:first-child .course_list_item_img svg g #top_line{
+        visibility: hidden;
+      }
+
+      #course_list li.course_list_item:last-child .course_list_item_img svg g #bottom_line{
+        visibility: hidden;
+      }
+      #course_list li.course_list_item_add{
+        position: relative;
+        height: 20px;
+        list-style-type: none;
+        color: #666;
+        padding: 10px 30px;
+        font-size: larger;
+      }
+      #course_list li.course_list_item_add:hover{
+        background-color: #eee;
+        cursor: pointer;
+      }
+
+      .course_list_item_img_selected{
+        fill: #A4FF8D;
+      }
+
+      #course_list li .course_list_item_name{
+        float: left; 
+        left: 58px;
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        white-space:nowrap;
+        cursor: pointer;
+      }
+      #next_course{
+        width: 200px;
+        height: 40px;
+        position: absolute;
+        background-color: #222222;
+        right: 60px;
+        bottom: 25px;
+        z-index: 2;
+        color: #666;
+        text-align: center;
+        font-size: x-large;
+        cursor: pointer;
+        border-radius: 2px;
+        line-height: 40px;
+      }
+      #edit_course{
+        width: 200px;
+        height: 40px;
+        position: absolute;
+        background-color: #222222;
+        right: 60px;
+        bottom: 70px;
+        z-index: 2;
+        color: #666;
+        text-align: center;
+        font-size: x-large;
+        cursor: pointer;
+        border-radius: 2px;
+        line-height: 40px;
+      }
+      #course_finish{
+        width: 200px;
+        height: 40px;
+        position: absolute;
+        background-color: #222222;
+        right: 60px;
+        bottom: 25px;
+        z-index: 2;
+        color: #666;
+        text-align: center;
+        font-size: x-large;
+        cursor: pointer;
+        border-radius: 2px;
+        line-height: 40px;
+      }
+      .course_list_item_detail{
+        position: absolute;
+        right: 0;
+        cursor: pointer;
+      }
+      .course_list_item_detail_menu{
+        display: block;
+        position: absolute;
+        background-color: white;
+        padding: 10px 0px;
+        border-radius: 5px;
+        box-shadow: 2px 2px 30px lightgrey;
+        transform-origin: center;
+        z-index: 2;
+        transform: scale(0);
+        transition: transform 0.2s, opacity 0.2s;
+        width: 200px;
+      }
+      .course_list_item_detail_menu_show{
+        transform: scale(1);
+        transform-origin: top left;
+      }
+
+      .course_list_item_detail_menu_item{
+        display: block;
+        padding: 10px 30px;
+        transition: 0.1s;
+        color: #666;
+      }
+      .course_list_item_detail_menu_item:hover{
+        background-color: #eee;
+        cursor: pointer;
+      }
+      .hidden {
+        visibility: hidden;
+      }
+    </style>
+    <script>
+      function Course() {
+        var courseName = '<%= data.courseName %>';
+        var courseList = eval('<%- JSON.stringify(data.courseList) %>');
+        var currentIndex = 0;
+        var mode = 'tour';
+        var map = null;
+        var panorama = null;
+
+
+        this.removeAt = function(index) {
+          if(index >= courseList.length - 1) {  
+            currentIndex = courseList.length - 2;
+          }
+          courseList.splice(index, 1);
+          this.panoramaReload();
+          this.listRefresh();
+        }
+        this.insertAt = function(index, obj) {
+          courseList.splice(index, 0, obj);
+          this.panoramaReload();
+          this.listRefresh();
+        }
+
+        this.getTitle = function() {
+          return courseName;
+        };
+        this.setTitle = function(title) {
+          courseName = title;
+        };
+        this.getList = function() {
+          return courseList;
+        };
+        this.setList = function(list) {
+          courseList = list;
+        };
+        this.getIndex = function() {
+          return currentIndex;
+        };
+        this.setIndex = function(i) {
+          currentIndex = i;
+          this.panoramaReload();
+          this.listRefresh();
+        };
+        this.getMode = function() {
+          return mode;
+        };
+        this.setMode = function(m) {
+          mode = m;
+        };
+        this.getMap = function() {
+          return map;
+        };
+        this.setMap = function(m) {
+          map = m;
+        };this.getPanorama = function() {
+          return panorama;
+        };
+        this.setPanorama = function(p) {
+          panorama = p;
+        };
+        this.nextIndex = function() {
+          if(currentIndex != courseList.length - 1){
+            currentIndex ++;
+            this.panoramaReload();
+          }
+          this.listRefresh();
+        };
+        this.listRefresh = function() {
+          
+          var _this = this;
+
+          var $list = $('div#course_list');
+          $list.empty();
+          
+          $('#next_course').removeClass('hidden');
+          $('#course_finish').addClass('hidden');
+          if(currentIndex >= courseList.length - 1) {  
+            currentIndex = courseList.length - 1;
+            $('#next_course').addClass('hidden');
+            if(this.getMode() == 'tour') {
+              $('#course_finish').removeClass('hidden');
+            }
+          }
+          courseList.forEach( (e, i) => {
+            const detail = `
+              <div class="course_list_item_detail">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="20" cy="11" r="2" fill="#a2a2a2"/>
+                  <circle cx="20" cy="29" r="2" fill="#a2a2a2"/>
+                  <circle cx="20" cy="20" r="2" fill="#a2a2a2"/>
+                </svg>
+                <div class="course_list_item_detail_menu hidden">
+                  <div class="course_list_item_detail_menu_item rename_place">장소 이름 변경</div>
+                  <div class="course_list_item_detail_menu_item replace_current_location">현재 위치로 설정</div>
+                </div>
+              </div>`
+
+            let $li = $(`
+              <li id="course_list_item_${i}" class="course_list_item">
+                <div id="course_list_item_img_${i}" class="course_list_item_img">
+                  <svg width="18" height="40" viewBox="0 0 18 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="group">
+                    <line id="bottom_line" x1="9" y1="20" x2="9" y2="40" stroke="#979797" stroke-width="2"/>
+                    <line id="top_line" x1="9" x2="9" y2="20" stroke="#979797" stroke-width="2"/>
+                    <circle id="outer_ellipse" r="9" transform="matrix(-1 0 0 1 9 20)" fill="#979797"/>
+                    <circle id="inner_ellipse" class="${(currentIndex == i)?'course_list_item_img_selected':''}" r="7" transform="matrix(-1 0 0 1 9 20)" fill="#d9d9d9"/>
+                    </g>
+                  </svg>
+                </div>
+                <div id="course_list_item_name_${i}" class="course_list_item_name" >${e.PlaceName}</div>
+                ${_this.getMode()=='edit'? detail:''}
+              </li> 
+            `);
+
+            $li.on('click', (e) => {
+              _this.setIndex(i)
+            })
+            if(_this.getMode() == 'edit'){
+              $li.children('.course_list_item_name').attr('draggable', 'true')
+              $li.children('.course_list_item_name').on('dragstart', (e) => {
+                e.originalEvent.dataTransfer.setData('text/plain', e.target.id);
+                e.originalEvent.currentTarget.style.backgroundColor = '#dcdcdc'
+              })
+              $li.children('.course_list_item_name').on('dragend', (e) => {
+                e.originalEvent.dataTransfer.setData('text/plain', e.target.id);
+                e.originalEvent.currentTarget.style.backgroundColor = ''
+              })
+              $li.on('dragover', (e) => {
+                e.preventDefault();
+              })
+              $li.on('drop', (e) => {
+                const draggableId = e.originalEvent.dataTransfer.getData('text');
+                const draggableIdx = draggableId.split('_').pop();
+                const targetId = e.target.id;
+                const targetIdx = targetId.split('_').pop();
+                // const $draggableEl = $(draggableId);
+                // const $targetEl = $(targetId);
+
+                const draggableItem = _this.getList()[draggableIdx];
+
+                _this.removeAt(draggableIdx)
+                _this.insertAt(targetIdx, draggableItem)
+                _this.setIndex(targetIdx)
+                
+
+                e.originalEvent.dataTransfer.clearData();
+              })
+              $li.children('div.course_list_item_detail').on('click', (e) => {
+                let $detailMenu = $li.children('div.course_list_item_detail').children('div.course_list_item_detail_menu')
+                if($detailMenu.hasClass('hidden')){
+                  $detailMenu.removeClass('hidden')
+                  $detailMenu.addClass('course_list_item_detail_menu_show')
+                  $(document).one('click', (e) => {
+                    $detailMenu.removeClass('course_list_item_detail_menu_show')
+                    $detailMenu.addClass('hidden')
+                  })
+                }else {
+                  $detailMenu.removeClass('course_list_item_detail_menu_show')
+                  $detailMenu.addClass('hidden')
+                }
+
+                e.stopPropagation()
+              })
+              $li.children('div.course_list_item_detail').children('div.course_list_item_detail_menu').children('div.rename_place').on('click', (e) => {
+                const list = _this.getList();
+                const result = prompt("장소 이름 입력", list[i].PlaceName);
+                if(result) {
+                  list[i].PlaceName = result
+                }
+                _this.listRefresh()
+              })
+              $li.children('div.course_list_item_detail').children('div.course_list_item_detail_menu').children('div.replace_current_location').on('click', (e) => {
+                const list = _this.getList();
+                const p =_this.getPanorama().getPosition();
+                list[i].Lat = p.lat()
+                list[i].Lng = p.lng()
+                
+              })
+            }
+            $list.append($li)
+          });
+          if(_this.getMode()=='edit'){
+            $list.append($(`
+            <li id="course_list_item_add" class="course_list_item_add">
+              + Add place
+            </li>
+            `))
+            $('#course_list_item_add').on('click', (e) => {
+              const list = _this.getList()
+              list.push(eval('(' + JSON.stringify(list[list.length - 1]) + ')'))
+              _this.listRefresh()
+            })
+          }
+
+          
+        }
+        this.panoramaReload = function(){
+          panorama.setPosition(new google.maps.LatLng(courseList[currentIndex].Lat, courseList[currentIndex].Lng));
+        }
+      } 
+
+      var course = new Course();
+
+      $(document).ready(() => {
+        $('#next_course').on('click', (e) => {
+          course.nextIndex();
+        })
+        $('#course_finish').on('click', (e) => {
+          window.location.href='/';
+        })
+        $('div#edit_course').on('click', (e) => {
+          if($('div#edit_course').text() == '수정'){
+            course.setMode('edit')
+            course.listRefresh()
+            course.panoramaReload()
+            $('div#edit_course').text('완료')
+          }else{
+            course.setMode('tour')
+            course.listRefresh()
+            course.panoramaReload()
+            $('div#edit_course').text('수정')
+            $.ajax({
+              url: "/api/course",
+              method: "POST",
+              data: { 
+                courseId: '<%= data.courseId %>',
+                list: JSON.stringify(course.getList()),
+              }
+            }).done(function() {
+              alert( "success" );
+            }).fail(function() {
+              alert( "error" );
+            })
+          }
+        })
+      })
+
+      function initialize() {
+        
+        course.listRefresh();
+
+        const startPostion = { lat: course.getList()[0].Lat, lng: course.getList()[0].Lng };
+
+        course.setMap( 
+          new google.maps.Map(document.getElementById("map"), {
+            center: startPostion,
+            zoom: 14,
+          })
+        )
+        // Set up the markers on the map
+        // const cafeMarker = new google.maps.Marker({
+        //   position: { lat: 40.730031, lng: -73.991428 },
+        //   map,
+        //   icon:
+        //     "https://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=cafe|FFFF00",
+        //   title: "Cafe",
+        // });
+        // const bankMarker = new google.maps.Marker({
+        //   position: { lat: 40.729681, lng: -73.991138 },
+        //   map,
+        //   icon:
+        //     "https://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=dollar|FFFF00",
+        //   title: "Bank",
+        // });
+        // const busMarker = new google.maps.Marker({
+        //   position: { lat: 40.729559, lng: -73.990741 },
+        //   map,
+        //   icon:
+        //     "https://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=bus|FFFF00",
+        //   title: "Bus Stop",
+        // });
+        // We get the map's default panorama and set up some defaults.
+        // Note that we don't yet set it visible.
+        course.setPanorama(
+          new google.maps.StreetViewPanorama(
+            document.getElementById("pano"),
+            {
+              position: startPostion,
+              pov: {
+                heading: 34,
+                pitch: 10,
+              },
+            }
+          )
+        )
+        course.getMap().setStreetView(course.getPanorama());
+        
+      }
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="sidetab">
+      <div id="course_title">
+        <%= data.courseName %>
+      </div>
+      <div id="course_list">
+      </div>
+    </div>
+    <div id="pano"></div>
+    <% if(data.editable){%>
+    <div id="edit_course">수정</div>
+    <%} %>
+    <div id="next_course" >다음 코스로</div>
+    <div id="course_finish" class="hidden">코스 끝내기</div>
+  </body>
+</html>

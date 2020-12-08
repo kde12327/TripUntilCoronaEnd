@@ -12,6 +12,10 @@ module.exports = function (sequlize, DataTypes) {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
+      ThumbnailFileName: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      }
     },
     {
       tableName: 'Course',
