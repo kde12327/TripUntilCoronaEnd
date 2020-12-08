@@ -7,6 +7,8 @@ var {
 } =  require ('../../models')
 
 router.post('/course', async function(req, res, next) {
+  // TODO: session check
+  // match course creater id == sesion.userId
   const courseId = JSON.parse(req.body.courseId)
   const list = JSON.parse(req.body.list)
 

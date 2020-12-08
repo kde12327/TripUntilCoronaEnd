@@ -59,6 +59,25 @@ router.get('/course/:courseId', async function(req, res, next) {
   });
 });
 
+router.get('/newcourse', async function(req, res, next) {
+  // TODO: session check
+  const userId = 1;
+  // req.session.valid = true;
+  const course = await Course.create({
+    CourseName: '코스명',
+    CreaterId: userId,
+  })
+  const place = await Place.create({
+    PlaceName: '장소명',
+    Idx: 0,
+    Lat: '37.5760034',
+    Lng: '126.9769167',
+  })
+  place.setCourse(course.CourseId)
+
+
+  res.redirect('/course/'+course.CourseId);
+});
 router.get('/about', function(req, res, next) {
   res.render('about', { title: 'TUCE' });
 });
