@@ -7,10 +7,15 @@
         </span>
        <span id=header__center>
            <span class="header__column"> <a href="/about">소개</a></span>
-           <span class="header__column"><a href="./test">코스 둘러보기</a></span>
-           <span class="header__column"><a href="./test">코스 만들기</a></span>
+           <span class="header__column"><a href="/">코스 둘러보기</a></span>
+           <span class="header__column"><a href="/newcourse">코스 만들기</a></span>
        </span>
         <span id="header__login">
+            <% if(session.accountId) { %>
+            <p><%= session.accountId %></p>
+            <form action="/logout" method="get"><input type="submit" value="Log out"></form>
+            <% }else{ %>
             <a href="./login">로그인</a>
+            <% } %>
         </span>
 </header>

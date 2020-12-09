@@ -8,7 +8,17 @@
     <%- include("./partials/header"); %>
     <div id="home__main">
         <div id="home__descript">추천코스</div>
-        <div class="home__content">
+        <% data.courseList.forEach(function(course, i){ %> 
+          <div class="home__content">
+            <a href="/course/<%= course.CourseId%>">
+              <figure>
+                <img src="/thumbnail/<%= course.ThumbnailFileName %>" />
+                <figcaption><%= course.CourseName %></figcaption>
+              </figure>
+            </a>
+         </div>
+        <% }) %>
+        <!-- <div class="home__content">
             <a href="">
               <figure>
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Colosseum_in_Rome%2C_Italy_-_April_2007.jpg/270px-Colosseum_in_Rome%2C_Italy_-_April_2007.jpg" />
@@ -31,7 +41,7 @@
                 <figcaption>남산을 따라서: 서울구경</figcaption>
               </figure>
             </a>
-         </div>
+         </div> -->
     </div>
     <%- include("./partials/footer"); %>
   </body>
