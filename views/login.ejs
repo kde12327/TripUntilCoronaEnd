@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <%- include("./partials/head"); %>
+		<%- include("./partials/head"); %>
+		
     </head>
     <body>
         <%- include("./partials/header"); %>
         <div class="login-form">
 			<h1>로그인</h1>
 			<form action="/login" method="POST">
-				<input type="text" name="username" placeholder="이름" required>
-				<input type="password" name="password" placeholder="비밀번호" required>
+				<input type="text" name="username" placeholder="이름" id="username" required>
+				<input type="password" name="password" placeholder="비밀번호" id="password" required>
 				<input type="submit" value="Login">
 			</form>
 			<p>
-			<a href="/register"><button id="register">회원가입</button></a>
+			<a href="/register"><button id="login">회원가입</button></a>
 			<p>
 		</div>
-        <%- include("./partials/footer"); %>
+		<%- include("./partials/footer"); %>
+		
+			
+		
     </body>
   </html>

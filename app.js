@@ -3,14 +3,17 @@ var createError = require('http-errors');
 var path = require('path');
 var fs = require('fs');
 var express = require('express');
+var session =require('express-session');
+var flash = require('connect-flash');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var favicon = require('serve-favicon');
-
+var flash = require('connect-flash');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+
 
 var sequelize = require('./models/index').sequelize;
 
@@ -27,9 +30,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
+app.use(session({
+  key:'key',
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: true
+}));
+
+app.use(flash());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

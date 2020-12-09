@@ -1,5 +1,5 @@
 module.exports = function (sequlize, DataTypes) {
-  const User = sequlize.define(
+  var User = sequlize.define(
     'User',
     {
       UserId: {
@@ -36,5 +36,5 @@ module.exports = function (sequlize, DataTypes) {
     // User.hasMany(models.MeasuringLine)
     // User.hasMany(models.Poi)
   }
-  return User
+  return User;
 }

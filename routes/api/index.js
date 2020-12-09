@@ -33,3 +33,33 @@ router.post('/course', async function(req, res, next) {
 });
 
 module.exports = router;
+
+
+/*function login() {
+    var data = {};
+    data.UserName = $("#username").val();
+	data.accountPassword = $("#password").val();
+	console.log('요청'+JSON.stringify(data));
+
+    $.ajax({
+        url:'/login',
+        type:"POST",
+        data: data,
+        dataType: 'json',
+        success: function (ansData, textStatus, jqXHR){
+            if(ansData.success){
+				 res.render('home',{ title :'TUCE'});
+            }else{
+				res.render('login',{ title :'TUCE'});
+            }
+		},
+		error: function (jqXHR,textStatus,errorThrow){
+
+		}
+    });
+}
+
+$('#login').click(function(){
+    login();
+})
+*/
