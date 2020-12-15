@@ -12,7 +12,7 @@
        </span>
         <span id="header__login">
             <% if(session.accountId) { %>
-            <p><%= session.accountId %></p>
+            <p id="accountId"><%= session.accountId %></p>
             <form action="/logout" method="get"><input type="submit" value="Log out"></form>
             <% }else{ %>
             <a href="./login">로그인</a>

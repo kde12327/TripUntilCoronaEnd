@@ -120,7 +120,7 @@ router.post("/register", async function(req,res) {
   console.log(req.body.password);
   const result = await models.User.findOne({where:{accountId: req.body.accountId}})
               
-      if(result.accountId==null){
+      if(result.accountId==null && req.body.password===req.body.password2){
             models.User
                 .create({UserName:req.body.username,
                 accountId:req.body.accountId,

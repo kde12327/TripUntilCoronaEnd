@@ -5,18 +5,20 @@
 		
     </head>
     <body>
-        <%- include("./partials/header"); %>
-        <div class="login-form">
-			<h1>로그인</h1>
-			<form action="/login" method="POST">
-				<input type="email" name="accountId" placeholder="이메일" id="accountId" required>
-				<input type="password" name="password" placeholder="비밀번호" id="password" required>
-				<input type="submit" value="Login">
-			</form>
-			<p>
-			<a href="/register"><button id="login">회원가입</button></a>
-			<p>
-		</div>
+		<%- include("./partials/header"); %>
+		<div id="login-wrap">
+			<div class="login-form">
+				<h1>로그인</h1>
+				<form action="/login" method="POST">
+					<input type="email" name="accountId" placeholder="이메일" id="accountId" required>
+					<input type="password" name="password" placeholder="비밀번호" id="password" required>
+					<input type="submit" value="Login">
+				</form>
+				<p>
+				<a href="/register"><button id="login">회원가입</button></a>
+				<p>
+			</div>
+	    </div>
 		<%- include("./partials/footer"); %>
 		
 			
