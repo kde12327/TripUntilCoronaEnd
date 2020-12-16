@@ -18,7 +18,7 @@ router.use('/api', apiRouter);
 /* GET home page. */
 router.get('/', async function(req, res, next) {
   const course = await Course.findAll();
-  console.log(course);
+  // console.log(course);
 
   res.render('home', { 
     title: 'TUCE',
@@ -32,9 +32,17 @@ router.get('/', async function(req, res, next) {
 
 router.get('/course/:courseId', async function(req, res, next) {
   const courseId = req.params.courseId;
-
-  // TODO: get userid from session
-  const userId = 1;
+  let userId;
+  if(req.session.accountId){
+    // TODO: get userid from session
+    const user = await User.findOne({
+      where: {
+        AccountId: req.session.accountId,
+      },
+    });
+    userId = user.UserId;
+  }
+  
 
   const course = await Course.findOne({
     where: {
@@ -50,24 +58,34 @@ router.get('/course/:courseId', async function(req, res, next) {
       }
     ]
   });
-  console.log(course);
-
-  res.render('course', { 
-    title: 'TUCE',
-    data: {
-      courseId: course.CourseId,
-      courseName: course.CourseName,
-      courseList: course.Places,
-      creater: course.User,
-      editable: userId == course.User.UserId? true: false
-    } , 
-    session: req.session
-  });
+  if(course){
+    res.render('course', { 
+      title: 'TUCE',
+      data: {
+        courseId: course.CourseId,
+        courseName: course.CourseName,
+        courseList: course.Places,
+        creater: course.User,
+        editable: userId == course.User.UserId? true: false
+      } , 
+      session: req.session
+    });
+  }else{
+    req.session.valid = true;
+    res.redirect('/');
+  }
+  
 });
 
 router.get('/newcourse', async function(req, res, next) {
+
   // TODO: session check
-  const userId = 1;
+  const user = await User.findOne({
+    where: {
+      AccountId: req.session.accountId,
+    },
+  });
+  const userId = user.UserId;
   // req.session.valid = true;
   const course = await Course.create({
     CourseName: '코스명',
@@ -81,7 +99,7 @@ router.get('/newcourse', async function(req, res, next) {
   })
   place.setCourse(course.CourseId)
 
-
+  req.session.valid = true;
   res.redirect('/course/'+course.CourseId);
 });
 router.get('/about', function(req, res, next) {
@@ -117,10 +135,10 @@ router.get("/register", function(req,res,next){
 });
 
 router.post("/register", async function(req,res) {
-  console.log(req.body.password);
+  // console.log(req.body.password);
   const result = await models.User.findOne({where:{accountId: req.body.accountId}})
               
-      if(result.accountId==null && req.body.password===req.body.password2){
+      if(result==null && req.body.password===req.body.password2){
             models.User
                 .create({UserName:req.body.username,
                 accountId:req.body.accountId,

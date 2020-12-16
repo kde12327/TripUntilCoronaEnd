@@ -22,7 +22,7 @@ router.get('/1', async function(req, res, next) {
       }
     ]
   })
-  console.log(eval('(' + JSON.stringify(course)+ ')'))
+  // console.log(eval('(' + JSON.stringify(course)+ ')'))
 
   res.render('test', { 
     title: 'Test Page', 
