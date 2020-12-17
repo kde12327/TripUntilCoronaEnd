@@ -12,7 +12,7 @@
           <div class="home__content">
             <a href="/course/<%= course.CourseId%>">
               <figure>
-                <img src="/thumbnail/<%= course.ThumbnailFileName %>" />
+                <img src="/thumbnail/<%= course.ThumbnailFileName? course.ThumbnailFileName: 'defaultThumbnail.png' %>" />
                 <figcaption><%= course.CourseName %></figcaption>
               </figure>
             </a>
