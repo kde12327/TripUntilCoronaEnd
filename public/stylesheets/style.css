@@ -82,6 +82,8 @@ header {
 
 #home__main {
   text-align: center;
+  height: 100%;
+  margin-bottom: 100px;
 }
 
 #home__descript {
